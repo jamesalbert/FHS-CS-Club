@@ -1,4 +1,9 @@
+hoc = require "hoc"
+
 move = 1
+
+--function player_collide()
+--function player_off()	
 
 function create_player(self,filename,x,y)
 	self = {
@@ -8,6 +13,9 @@ function create_player(self,filename,x,y)
 		},
 		image      = {
 			body   = love.graphics.newImage(filename),
+		},
+		collide = {
+			detect = hoc(100, player_collide, player_off)
 		}
 	}
 	width  = self.image.body:getWidth()
