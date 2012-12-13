@@ -17,7 +17,7 @@ function create_player(self,filename,x,y)
 		}
 	}
 	self.width  = self.image.body:getWidth()
-    self.height = self.image.body:getHeight()
+	self.height = self.image.body:getHeight()
 	self.form   = self.collide.detect:addRectangle(
 		x,
 		y,
