@@ -2,33 +2,49 @@ hoc = require "hoc"
 
 move = 1
 
---function player_collide()
 --function player_off()	
-
 function create_player(self,filename,x,y)
 	self = {
 		placement = {
 			x     = x,
 			y     = y
 		},
-		image      = {
-			body   = love.graphics.newImage(filename),
+		image = {
+			body = love.graphics.newImage(filename),
 		},
 		collide = {
-			detect = hoc(100, player_collide, player_off)
+			detect = hoc(100, player_collide)
 		}
 	}
-	width  = self.image.body:getWidth()
-    height = self.image.body:getHeight()
+	self.width  = self.image.body:getWidth()
+    self.height = self.image.body:getHeight()
+	self.form   = self.collide.detect:addRectangle(
+		x,
+		y,
+		self.width,
+		self.height
+	)
 	return self
 end
 
+function player_collide()
+    move = move * -1
+end
+
 function love.load()
-	player = create_player(player, 'largeVLC.png', 10, 10)
+	player  = create_player(player, 'largeVLC.png', 10, 10)
+	collide = player.collide.detect
+	
+	force   = collide:addRectangle(500, 0, 100, 700)
 end
 
 function love.update(dt)
 	player.placement.x = player.placement.x + move
+	player.form:move(
+		player.placement.x,
+		player.placement.y
+	)
+	collide:update(dt)
 end
 
 function love.keypressed(key)
@@ -43,4 +59,5 @@ function love.draw()
 		player.placement.x,
 		player.placement.y
 	)
+	force:draw('fill')
 end
