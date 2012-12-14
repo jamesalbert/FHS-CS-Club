@@ -2,7 +2,8 @@ hoc = require "hoc"
 
 move = 1
 
---function player_off()
+function player_off()
+end
 	
 function create_player(self,filename,x,y)
 	self = {
