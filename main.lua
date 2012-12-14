@@ -2,7 +2,8 @@ hoc = require "hoc"
 
 move = 1
 
---function player_off()	
+--function player_off()
+	
 function create_player(self,filename,x,y)
 	self = {
 		placement = {
@@ -19,8 +20,8 @@ function create_player(self,filename,x,y)
 	self.width  = self.image.body:getWidth()
 	self.height = self.image.body:getHeight()
 	self.form   = self.collide.detect:addRectangle(
-		x,
-		y,
+		self.placement.x,
+		self.placement.y,
 		self.width,
 		self.height
 	)
@@ -40,10 +41,7 @@ end
 
 function love.update(dt)
 	player.placement.x = player.placement.x + move
-	player.form:move(
-		player.placement.x,
-		player.placement.y
-	)
+	player.form:move(move,0)
 	collide:update(dt)
 end
 
@@ -59,5 +57,6 @@ function love.draw()
 		player.placement.x,
 		player.placement.y
 	)
-	force:draw('fill')
+	force:draw('line')
+	player.form:draw('line')
 end
