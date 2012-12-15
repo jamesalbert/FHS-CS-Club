@@ -1,7 +1,7 @@
 hoc = require "hoc"
 
 move = 1
-new_var = 2
+new_var = 8
 
 function player_off()
 end
