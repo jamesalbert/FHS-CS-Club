@@ -4,6 +4,7 @@ move = 1
 new_var = 8
 
 function player_off()
+	print('this is what was going on')
 end
 	
 function create_player(self,filename,x,y)
