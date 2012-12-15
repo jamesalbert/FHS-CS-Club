@@ -4,6 +4,7 @@ move = 1
 new_var = 3
 
 function player_off()
+	move = 0
 end
 	
 function create_player(self,filename,x,y)
