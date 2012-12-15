@@ -30,7 +30,7 @@ function create_player(self,filename,x,y)
 end
 
 function player_collide()
-    move = move * -2
+    move = move * -1
 end
 
 function love.load()
