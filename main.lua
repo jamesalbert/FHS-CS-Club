@@ -4,7 +4,7 @@ move = 1
 new_var = 8
 
 function player_off()
-	move = 0
+	player = nil
 end
 	
 function create_player(self,filename,x,y)
