@@ -68,9 +68,13 @@ end
 --This function gets called when a key is pressed.
 
 function love.keypressed(key)
-    if key == ' ' then
-        move = move * -1
-    end 
+    if key == 'd'
+	and move ~= 1 then
+        move = move * -1 
+	elseif key == 'a'
+	and move ~= -1 then
+		move = move * -1
+	end
 end
 
 --The next two functions are called over and
