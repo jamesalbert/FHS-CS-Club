@@ -1,8 +1,5 @@
 hoc = require "hoc"
 
---This variable will be used later.
-move = 1
-
 --When we set up a collision detector,
 --there is one function that is called
 --when the collision begins, and another
@@ -11,13 +8,13 @@ move = 1
 --This one is called when the collision begins.
 
 function player_collide()
-    move = move * -1
+	--player.placement.x = player.old.x
+	--player.placement.y = player.old.y
 end
 
 --This one is called when the collision ends.
 
-function player_off()
-	player = nil
+function player_off()	
 end
 	
 --This function, like any other, can be
@@ -35,6 +32,15 @@ function create_player(self,filename,x,y)
 		placement = {
 			x     = x,
 			y     = y
+		},
+		old = {
+			x = 0,
+			y = 0
+		},
+		move = {
+			x    = 0,
+			y    = 0,
+			spin = 0
 		},
 		image = {
 			body = love.graphics.newImage(filename),
@@ -54,12 +60,20 @@ function create_player(self,filename,x,y)
 	return self
 end
 
+function x_stop()
+	player.move.x = 0
+end
+
+function y_stop()
+	player.move.y = 0
+end
+
 --All of these functions get called when the code gets ran.
 
 --This function only gets called once, at run time.
 
 function love.load()
-	player  = create_player(player, 'largeVLC.png', 10, 10)
+	player  = create_player(player, 'player.png', 100, 100)
 	collide = player.collide.detect
 	
 	force   = collide:addRectangle(500, 0, 100, 700)
@@ -68,12 +82,18 @@ end
 --This function gets called when a key is pressed.
 
 function love.keypressed(key)
-    if key == 'd'
-	and move ~= 1 then
-        move = move * -1 
-	elseif key == 'a'
-	and move ~= -1 then
-		move = move * -1
+    if key == 'd' then
+		y_stop()
+        player.move.x = 4
+    elseif key == 'a' then
+		y_stop()
+		player.move.x = -4
+	elseif key == 'w' then
+		x_stop()
+		player.move.y = -4
+	elseif key == 's' then
+		x_stop()
+		player.move.y = 4
 	end
 end
 
@@ -82,8 +102,10 @@ end
 --the program is stopped.
 
 function love.update(dt)
-	player.placement.x = player.placement.x + move
-	player.form:move(move,0)
+	player.placement.x = player.placement.x + player.move.x
+	player.placement.y = player.placement.y + player.move.y
+	player.move.spin = player.move.spin + dt
+	player.form:move(player.move.x,player.move.y)
 	collide:update(dt)
 end
 
@@ -91,7 +113,18 @@ function love.draw()
 	love.graphics.draw(
 		player.image.body,
 		player.placement.x,
-		player.placement.y
+		player.placement.y,
+		player.move.spin,
+		1, 1,
+		player.width - player.width/2,
+		player.height - player.height/2
+	)
+	love.graphics.circle(
+		'fill',
+		love.graphics.getWidth()/2,
+		love.graphics.getHeight()/2,
+		50,
+		360
 	)
 	force:draw('line')
 	player.form:draw('line')
