@@ -7,7 +7,8 @@ detect = hoc(100, player_collide, player_dismiss)
 move = 0
 jump = 0
 jump_on = 0
-jump_off = 1
+jump_off = -1
+frame = 12
 
 function big_bang(self, filename)
 	self = {
@@ -44,7 +45,8 @@ function init_player(self, filename)
 	self.image.default = love.graphics.newQuad( 76, 38, self.w, self.h, self.image.width, self.image.height )
 	self.image.back = love.graphics.newQuad( 190, 228, self.w, self.h, self.image.width, self.image.height )
 	self.image.jump = love.graphics.newQuad( 38, 38, self.w, self.h, self.image.width, self.image.height ) 
-	self.animation = newAnimation(self.image.sprite, 38, 38, 0.1, 6)
+	self.animation = newAnimation(self.image.sprite, 38, 38, 0.1, 0)
+	self.animation:setMode("bounce")
 	self.collision.form = detect:addRectangle(
 		self.x, self.y, self.w, self.h
 	)
@@ -103,7 +105,8 @@ function get_key()
 			if jump ~= 0 and jump_on == 0 then
                 jump = jump + 2
 				if jump == 0 then
-					jump_off = 1
+					jump_off = -1
+					jump_on = 1
 				end
             end
 			if jump == 0 then
@@ -130,13 +133,12 @@ end
 function love.load()
 	world  = big_bang(world, 'world.png')
 	player = init_player(player, 'player.png')
+	player.animation:seek(13)
+	--player.animation:seek(12)
 	--enemy  = world_objects('enemy.png')
 end
 
 function love.keypressed(key)
-	if key == ' ' then
-		jump_off = jump_off * -1
-	end
 end
 
 function love.keyreleased(key)
@@ -144,6 +146,11 @@ end
 
 function love.update(dt)
 	--get_key()
+	--player.animation:seek(6)
+	frame = frame + dt
+	if frame >= 20 then
+		frame = 13
+	end
 	player.animation:update(dt)
 end
 
@@ -155,5 +162,6 @@ function love.draw()
 	--player.animation:draw(200, 200)
 	--love.graphics.drawq(player.image.sprite, player.image.default, 200+player.speed, 385)
 	get_key()
+	player.animation:draw(200,200)
 	love.graphics.print(move, 50 - move, 50)
 end
