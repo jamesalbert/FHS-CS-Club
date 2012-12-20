@@ -1,131 +1,129 @@
-hoc = require "hoc"
+require("AnAL")
+hoc = require 'hoc'
 
---When we set up a collision detector,
---there is one function that is called
---when the collision begins, and another
---that is called once the collision ends.
+--level 1
 
---This one is called when the collision begins.
+detect = hoc(100, player_collide, player_dismiss)
+move = 0
 
-function player_collide()
-	--player.placement.x = player.old.x
-	--player.placement.y = player.old.y
-end
-
---This one is called when the collision ends.
-
-function player_off()	
-end
-	
---This function, like any other, can be
---called as many times as possible; therefore,
---we can use it to create players the user
---control and enemies, bosses, etc that the
---user can not control. This function is
---used in this format:
-	--	player = create_player(player, '/directory/to/file.png', 10, 10)
---This constructs an object from the variable player. Player is now an
---object, or as they call it in Lua, a table.
-
-function create_player(self,filename,x,y)
+function big_bang(self, filename)
 	self = {
-		placement = {
-			x     = x,
-			y     = y
-		},
-		old = {
-			x = 0,
-			y = 0
-		},
-		move = {
-			x    = 0,
-			y    = 0,
-			spin = 0
-		},
-		image = {
-			body = love.graphics.newImage(filename),
-		},
-		collide = {
-			detect = hoc(100, player_collide)
-		}
+		x     = -16,
+		y     = -16,
+		image = love.graphics.newImage(filename),
+		update_world = function (image, x, y)
+			love.graphics.draw(image, x, y)
+		end
 	}
-	self.width  = self.image.body:getWidth()
-	self.height = self.image.body:getHeight()
-	self.form   = self.collide.detect:addRectangle(
-		self.placement.x,
-		self.placement.y,
-		self.width,
-		self.height
+	self.w = self.image:getWidth()
+	self.h = self.image:getHeight()
+	return self
+end
+
+function init_player(self, filename)
+	self = {
+		x       = 50,
+		y       = 500,
+		w       = 38,
+		h       = 38,
+		speed   = 0,
+		image   = {
+			sprite  = love.graphics.newImage(filename)
+--			change_to = function (frame)
+--				if frame == 'default' then
+--					love.graphics.drawq(self.image.sprite, self.image.default, 200+self.speed, 385)
+--				elseif frame == 'back' then
+--					love.graphics.drawq(self.image.sprite, self.image.back, 200+self.speed, 385)
+--				end
+--			end
+		},
+		collision = {},
+		update_player = function (image, x, y)
+			love.graphics.draw(image, x, y)
+		end
+	}
+	self.image.default = love.graphics.newQuad( 76, 38, self.w, self.h, 419, 270 )
+	self.image.back = love.graphics.newQuad( 190, 228, self.w, self.h, 419, 270 )
+	self.animation = newAnimation(self.image.sprite, 38, 38, 0.1, 6)
+	self.collision.form = detect:addRectangle(
+		self.x, self.y, self.w, self.h
+	)
+	self.image.change_to = function (frame)
+        if frame == 'default' then
+            love.graphics.drawq(self.image.sprite, self.image.default, 200+self.speed, 385)
+        elseif frame == 'back' then
+            love.graphics.drawq(self.image.sprite, self.image.back, 200+self.speed, 385)
+        end 
+    end
+	return self
+end
+
+function world_object(self, filename)
+	self = {
+		x     = 200,
+		y     = 500,
+		image = self.image.newImage(filename)
+	}
+	self.w = self.image:getWidth()
+    self.h = self.image:getHeight()
+	self.collision.form = detect:addRectangle(
+		self.x, self.y, self.w, self.h
 	)
 	return self
 end
 
-function x_stop()
-	player.move.x = 0
+function player_collide()
 end
 
-function y_stop()
-	player.move.y = 0
+function player_dismiss()
 end
 
---All of these functions get called when the code gets ran.
-
---This function only gets called once, at run time.
-
-function love.load()
-	player  = create_player(player, 'player.png', 100, 100)
-	collide = player.collide.detect
-	
-	force   = collide:addRectangle(500, 0, 100, 700)
-end
-
---This function gets called when a key is pressed.
-
-function love.keypressed(key)
-    if key == 'd' then
-		y_stop()
-        player.move.x = 4
-    elseif key == 'a' then
-		y_stop()
-		player.move.x = -4
-	elseif key == 'w' then
-		x_stop()
-		player.move.y = -4
-	elseif key == 's' then
-		x_stop()
-		player.move.y = 4
+function get_key()
+	if move < 1 and move > -2020 then
+		if love.keyboard.isDown('a') then
+			player.image.change_to('back')
+			move = move + 2
+			player.speed = player.speed - 2
+		else
+			player.image.change_to('default')
+			move = move - 2
+            player.speed = player.speed + 2
+		end
+	elseif move >= 1 then
+		move = 0
+		player.speed = 0
+	elseif move <= -2020 then
+		--move = move + 2
+		--player.speed = player.speed - 2
 	end
 end
 
---The next two functions are called over and
---over again (around once every .335 ms) until
---the program is stopped.
+--------------------------------------------------
+
+function love.load()
+	world  = big_bang(world, 'world.png')
+	player = init_player(player, 'player.png')
+	--enemy  = world_objects('enemy.png')
+end
+
+function love.keypressed(key)
+end
+
+function love.keyreleased(key)
+end
 
 function love.update(dt)
-	player.placement.x = player.placement.x + player.move.x
-	player.placement.y = player.placement.y + player.move.y
-	player.move.spin = player.move.spin + dt
-	player.form:move(player.move.x,player.move.y)
-	collide:update(dt)
+	--get_key()
+	player.animation:update(dt)
 end
 
 function love.draw()
-	love.graphics.draw(
-		player.image.body,
-		player.placement.x,
-		player.placement.y,
-		player.move.spin,
-		1, 1,
-		player.width - player.width/2,
-		player.height - player.height/2
-	)
-	love.graphics.circle(
-		'fill',
-		love.graphics.getWidth()/2,
-		love.graphics.getHeight()/2,
-		50,
-		360
-	)
-	force:draw('line')
-	player.form:draw('line')
+	--get_key() wrong placement
+
+	love.graphics.translate(move,0)
+	world.update_world(world.image, world.x, world.y)
+	--player.animation:draw(200, 200)
+	--love.graphics.drawq(player.image.sprite, player.image.default, 200+player.speed, 385)
+	get_key()
+	love.graphics.print(move, 50 - move, 50)
 end
